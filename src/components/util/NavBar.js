@@ -31,7 +31,7 @@ const NavBar = ({doLogout}) => {
   )
 
   return (
-    <nav>
+    <nav style={{height: '5%'}}>
       <Link to="/">
         <img id="logo" alt="uport-logo" src={uportLogo}/>
         <div>Truffle Box</div>

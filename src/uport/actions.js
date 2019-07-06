@@ -4,6 +4,7 @@
 export const DISCLOSURE_RECEIVED = '@uport/DISCLOSURE_RECEIVED'
 
 export function userDisclosedData(userData) {
+  console.log(userData)
   return {
     type: DISCLOSURE_RECEIVED,
     payload: userData

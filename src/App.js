@@ -6,9 +6,9 @@ import { Home, Dashboard, UserIsAuthenticated, NavBar } from './components'
 import { uport, handleDisclosure } from './uport'
 
 // Styles
+
 import './App.css'
 import './assets/css/open-sans.css'
-
 // Protect dashboard page with login
 const AuthOnlyDashboard = UserIsAuthenticated(Dashboard)
 
