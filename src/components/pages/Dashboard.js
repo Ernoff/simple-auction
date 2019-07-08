@@ -34,15 +34,26 @@ class Dashboard extends React.Component {
 
     instance.events.HighestBidIncreased({
         fromBlock: 0
-    }, (error, event) => { console.log(event); })
+    }, (error, event) => { 
+      if(event) {
+        let raised = this.state.raised + Number(event.returnValues.amount);
+        this.setState({highestBid: Number(event.returnValues.amount), highestBidder: event.returnValues.bidder, raised})  
+      }
+      console.log(error)
+     })
     .on('data', (event) => {
+
+      // you can use this event to show bid history
       console.log('high level')
-        console.log(event); // same results as the optional callback above
+      console.log(Number(event.returnValues.amount))
+        console.log(event.returnValues.bidder); // same results as the optional callback above
     })
     .on('changed', (event) => {
+      console.log('changed');
+      console.log(event)
         // remove event from local database
     })
-    .on('error', console.error);
+    .on('error', error => console.error(error));
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
