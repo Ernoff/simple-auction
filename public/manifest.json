@@ -1,13 +1,6 @@
 {
-  "short_name": "uPort Box",
-  "name": "React, uPort, and Truffle Boilerplate",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    }
-  ],
+  "short_name": "Live Auction",
+  "name": "Live Auction POC with React, uPort, and Truffle Boilerplate",
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#000000",

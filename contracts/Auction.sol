@@ -34,13 +34,6 @@ contract Auction {
     biddingTime = _biddingTime;
   }
 
-  function getDetails() public view returns (uint256[] memory r) {
-    r = new uint256[](3);
-    r[0] = biddingTime;
-    r[1] = highestBid;
-    r[2] = uint256(highestBidder);
-    return r;
-  }
 
    function getTime() internal view returns (uint) {
     return now;

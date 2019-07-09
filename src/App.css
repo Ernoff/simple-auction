@@ -5,7 +5,7 @@ body {
 }
 
 main {
-  margin: 2rem 0 0 0;
+  margin: 6rem 0 0 0;
   padding: 1em 10%;
   font-size: 14pt;
 }
@@ -45,7 +45,7 @@ nav {
   left: 0;
   width: 100%;
   height: 2rem;
-  padding: 0.25em 5%;
+  padding: 0.5em 5%;
   background-color: #5c50ca;
   border-bottom: 1px solid #aaa;
   box-shadow: 1px 1px 2px #aaa;
@@ -90,12 +90,13 @@ nav > ul > * {
 
 button {
   cursor: pointer;
+  /* margin-top: 0.5em; */
   padding: 0.25em 0.5em;
   border: 1px solid #aaa;
   border-radius: 0.25em;
   background-color: #fff;
   box-shadow: none;
-  font-size: 1em;
+  font-size: 0.75em;
   color: #5c50ca;
 }
 

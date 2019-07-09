@@ -17,7 +17,7 @@ const NavBar = ({doLogout}) => {
         <Link to="/dashboard">Dashboard</Link>
       </li>
       <li>
-        <button onClick={doLogout}>logout</button>
+        <button onClick={() => doLogout()}>logout</button>
       </li>
     </React.Fragment>
   )
@@ -31,12 +31,13 @@ const NavBar = ({doLogout}) => {
   )
 
   return (
-    <nav style={{height: '5%'}}>
+    <nav style={{height: '7%'}}>
       <Link to="/">
         <img id="logo" alt="uport-logo" src={uportLogo}/>
-        <div>Truffle Box</div>
+        <div>Live Auction</div>
       </Link>
       <ul id="nav-right">
+      <div><p/></div>
         <OnlyGuestLinks />
         <OnlyAuthLinks />
       </ul>

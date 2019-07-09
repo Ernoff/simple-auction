@@ -23,7 +23,7 @@ import { Connect } from 'uport-connect'
  * 
  */
 
-export const uport = new Connect('Truffle Box', {
+export const uport = new Connect('Live Auction', {
   // Connect Options:
   
 })

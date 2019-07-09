@@ -2,58 +2,66 @@ import React from 'react'
 import { connect } from 'react-redux'
 import AuctionContract from "./Auction.json";
 import getWeb3 from "../util/getWeb3";
-
+import Countdown from 'react-countdown-now';
 
 
 class Dashboard extends React.Component {
-  state = { 
-    web3: null, 
-    accounts: null, 
-    contract: null, 
-    beneficiary: null, 
-    highestBid: null, 
-    highestBidder: null,
-    balance: null,
-    bid: 0,
-    raised: 0,
-    error: null
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      web3: null,
+      accounts: null,
+      contract: null,
+      beneficiary: null,
+      highestBid: null,
+      highestBidder: null,
+      balance: null,
+      bid: 0,
+      raised: 0,
+      auctionDuration: 0,
+      error: null,
+      authData: this.props.authData ? this.props.authData : null
+    };
+    this.makeBid = this.makeBid.bind(this);
+  }
+
   componentDidMount = async () => {
-    try { 
-    const web3 = await getWeb3();
-    const accounts = await web3.eth.getAccounts();
-    const accouintBal = await web3.eth.getBalance(accounts[0]);
-    const accountBalInEther = await web3.eth.utils.fromWei(`${accouintBal}`, 'ether');
-    const networkId = await web3.eth.net.getId();
+    
+    try {
+      const web3 = await getWeb3();
+      const accounts = await web3.eth.getAccounts();
+      const accouintBal = await web3.eth.getBalance(accounts[0]);
+      const accountBalInEther = await web3.eth.utils.fromWei(`${accouintBal}`, 'ether');
+      const networkId = await web3.eth.net.getId();
       const deployedNetwork = AuctionContract.networks[networkId];
       const instance = new web3.eth.Contract(
         AuctionContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
-      this.setState({ web3, accounts, contract: instance, balance: accountBalInEther}, this.getDetails);
+      await this.setState({ web3, accounts, contract: instance, balance: accountBalInEther }, this.getDetails);
 
-    instance.events.HighestBidIncreased({
+      await instance.events.HighestBidIncreased({
         fromBlock: 0
-    }, (error, event) => { 
-      if(event) {
-        let raised = this.state.raised + Number(event.returnValues.amount);
-        this.setState({highestBid: Number(event.returnValues.amount), highestBidder: event.returnValues.bidder, raised})  
-      }
-      console.log(error)
-     })
-    .on('data', (event) => {
+      }, (error, event) => {
+        if (event) {
+          let raised = this.state.raised + Number(event.returnValues.amount);
+          this.setState({ highestBid: Number(event.returnValues.amount), highestBidder: event.returnValues.bidder, raised })
+        }
+        console.log(error)
+      })
+        .on('data', (event) => {
 
-      // you can use this event to show bid history
-      console.log('high level')
-      console.log(Number(event.returnValues.amount))
-        console.log(event.returnValues.bidder); // same results as the optional callback above
-    })
-    .on('changed', (event) => {
-      console.log('changed');
-      console.log(event)
-        // remove event from local database
-    })
-    .on('error', error => console.error(error));
+          // you can use this event to show bid history
+          console.log('high level')
+          console.log(Number(event.returnValues.amount))
+          console.log(event.returnValues.bidder); // same results as the optional callback above
+        })
+        .on('changed', (event) => {
+          console.log('changed');
+          console.log(event)
+          // remove event from local database
+        })
+        .on('error', error => console.error(error));
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -63,23 +71,25 @@ class Dashboard extends React.Component {
     }
   }
   makeBid = async () => {
-    const { accounts, contract, bid, raised } = this.state;
+    const { accounts, contract, bid } = this.state;
+    const self = this
     // try {
     await contract.methods.bid().send({ from: accounts[0], value: bid })
-    .on('transactionHash', (hash) => {
-      console.log(hash)
-    })
-    .on('confirmation', (confirmation, receipt) => {
-      console.log('first', confirmation, receipt)
-    })
-    .on('receipt', (receipt) => {
-      console.log('second',receipt)
-    })
-    .on('error', (error) => {
-      console.log(error)
-    })
-    let newraised = raised + bid
-    await this.setState({raised: newraised}, this.getDetails);
+      .on('transactionHash', (hash) => {
+        console.log(hash)
+        self.setState({ bid: null })
+      })
+      .on('confirmation', (confirmation, receipt) => {
+        console.log('first', confirmation, receipt)
+      })
+      .on('receipt', (receipt) => {
+        console.log('second', receipt)
+      })
+      .on('error', (error) => {
+        console.log(error)
+      });
+    // let newraised = raised + bid
+    // await this.setState({raised: newraised}, this.getDetails);
     // }
     // catch(error) {
     //   console.log(error);
@@ -87,26 +97,34 @@ class Dashboard extends React.Component {
     // }
   }
   getDetails = async () => {
-    const { contract }= this.state;
+    const { contract } = this.state;
 
     const beneficiary = await contract.methods.beneficiary().call();
+    const auctionStart = await contract.methods.auctionStart().call();
     const biddingTime = await contract.methods.biddingTime().call();
     const highestBid = await contract.methods.highestBid().call();
     const highestBidder = await contract.methods.highestBidder().call();
-    this.setState({beneficiary, biddingTime: Number(biddingTime)/1000, highestBid: Number(highestBid), highestBidder});
+    const auctionDuration = await (Number(auctionStart) * 1000) + (Number(biddingTime) * 1000);
+    console.log(auctionDuration.toString())
+    this.setState({ beneficiary, auctionDuration, highestBid: Number(highestBid), highestBidder });
+  }
+  componentDidCatch(error, info) {
+    console.log('error')
+    console.log(error, info)
   }
   render() {
-    const authData = this.props.authData;
-    const { name, verified } = authData || {}
+    const { name, verified } = this.state.authData || {}
     // console.log('DASHBOARD RENDERING', authData);
-    const {accounts, beneficiary, highestBid, highestBidder, biddingTime, balance, response, raised} = this.state;
+    const { accounts, beneficiary, highestBid, highestBidder, balance, response, raised, bid, auctionDuration } = this.state;
     return (
       <div>
         <div>
-          <h1>Dashboard</h1>
-          <p><strong>Congratulations {name}!</strong> with address {accounts? accounts[0] : ""} If you're seeing this page, you've logged in with uPort successfully.</p>
+          <h1>Auction</h1>
+          <p><strong>Welcome {name}!</strong></p>
+          <p>Participate in the auction below before the time runs out</p>
+          {/* <p><strong>Congratulations {name}!</strong> with address {accounts ? accounts[0] : ""} If you're seeing this page, you've logged in with uPort successfully.</p>
           <p>Here are the verifications you've shared with this app:</p>
-          <p>Change the data displayed here by updating the <code>verified</code> property in the argument to <code>requestDisclosure</code> in <code>src/components/util/LoginButton.js</code></p>
+          <p>Change the data displayed here by updating the <code>verified</code> property in the argument to <code>requestDisclosure</code> in <code>src/components/util/LoginButton.js</code></p> */}
           <div className="row">
             <div className="column">
               <label>Beneficiary</label>
@@ -117,21 +135,25 @@ class Dashboard extends React.Component {
               <blockquote><p><em><span id="raised">{raised}</span><br />ETH</em></p></blockquote>
             </div>
             <div className="column">
-              <label>Timeleft</label>
-              <blockquote><p><em id="timeleft">{biddingTime ? biddingTime : "Loading.."}</em><br />seconds</p></blockquote>
+              <label>Time left</label>
+              <blockquote><p><em id="timeleft">{auctionDuration ? (
+                <Countdown
+                  date={new Date(auctionDuration)}
+                ><em>Time up</em></Countdown>
+              ) : "Loading.."}</em><br /></p></blockquote>
             </div>
             <div className="column">
               <label>Highest Bidder</label>
               <blockquote><p><em><span id="highestBidder">{highestBidder ? highestBidder.substr(0, 12) : ""}</span><br />
-                <span id="highestBid">{highestBid ? highestBid : 0 }</span> ETH</em></p></blockquote>
+                <span id="highestBid">{highestBid ? highestBid : 0}</span> ETH</em></p></blockquote>
             </div>
             <div className="column">
               <label>Your Account</label>
-              <blockquote><p><em id="accountAddress">{this.state.accounts ? this.state.accounts[0].substr(0, 12) : "Loading.."}</em><br /><br /></p></blockquote>
+              <blockquote><p><em id="accountAddress">{accounts ? accounts[0].substr(0, 12) : "Loading.."}</em><br /><br /></p></blockquote>
             </div>
             <div className="column">
               <label>Balance</label>
-              <blockquote><p><em id="accountBalance">{balance ? balance : "Loading.."}</em><br />ETH</p></blockquote>
+              <blockquote><p><em id="accountBalance">{balance ? Math.trunc(balance) : "Loading.."}</em><br />ETH</p></blockquote>
             </div>
           </div>
           <hr />
@@ -140,28 +162,28 @@ class Dashboard extends React.Component {
             <div className="column column-33">
               <label>From Account</label>
               <select id="bidAccount">
-              {this.state.accounts && this.state.accounts.map((account, index) => {
-               return <option key={index} value={account}>{account}</option>
-              })}
-                {/* <Option accounts={accounts}/> */}
+                {accounts && accounts.map((account, index) => {
+                  return <option key={index} value={account}>{account}</option>
+                })}
               </select>
             </div>
             <div className="column column-25">
               <label>Bid Amount</label>
-              <input type="number" id="bidAmount" placeholder="28300 ether" onChange={e => this.setState({bid: e.target.value})} />
+              <input type="number" id="bidAmount" placeholder="28300 ether" onChange={e => this.setState({ bid: e.target.value })} />
             </div>
             <div className="column column-25">
               <label><br /></label>
-              <button 
-              id="makeBid"
-              onClick={() => this.makeBid()}
+              <button
+                id="makeBid"
+                // disabled={Date.now() > auctionDuration}
+                onClick={() => this.makeBid()}
               >Bid</button>
             </div>
           </div>
 
           <hr />
 
-          <button id="endAuction" disabled="disabled">End Auction</button>
+          {/* <button id="endAuction" disabled={beneficiary !== accounts}>End Auction</button> */}
 
           <br /><br />
 
@@ -176,12 +198,6 @@ class Dashboard extends React.Component {
   }
 }
 
-// const Option = ({accounts}) => (
-//   <select>
-//   {accounts.forEach((address) => {
-//   <option value={address}>{address}</option>})}
-//   </select>
-// )
 const AttestationCard = ({ claim, iss, sub }) => (
   <div className="card">
     <h4>subject: <code>{sub}</code></h4>

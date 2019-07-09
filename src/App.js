@@ -34,7 +34,7 @@ export default connect(
     loggedIn: !!state.user.data
   }),
   // mapDispatchToProps
-  (dispatch) => ({
+   (dispatch) => ({
     restoreUserData: handleDisclosure(dispatch)
   })
 )(App)

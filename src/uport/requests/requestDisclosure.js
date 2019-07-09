@@ -29,7 +29,6 @@ export function requestDisclosure({requested = ['name'], verified}) {
 export function handleDisclosure(dispatch) {
   return function(userData) {
     dispatch(userDisclosedData(userData))
-  
     // Use a manual redirect here as opposed to a wrapper.
     // This way, once logged in a user can still access the home page.
     if ('redirect' in history.location) {
