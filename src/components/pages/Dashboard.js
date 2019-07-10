@@ -23,6 +23,7 @@ class Dashboard extends React.Component {
       authData: this.props.authData ? this.props.authData : null
     };
     this.makeBid = this.makeBid.bind(this);
+    this.getDetails = this.getDetails.bind(this);
   }
 
   componentDidMount = async () => {
@@ -77,7 +78,7 @@ class Dashboard extends React.Component {
     await contract.methods.bid().send({ from: accounts[0], value: bid })
       .on('transactionHash', (hash) => {
         console.log(hash)
-        self.setState({ bid: null })
+        self.getDetails()
       })
       .on('confirmation', (confirmation, receipt) => {
         console.log('first', confirmation, receipt)
@@ -86,7 +87,9 @@ class Dashboard extends React.Component {
         console.log('second', receipt)
       })
       .on('error', (error) => {
-        console.log(error)
+        console.log("error")
+        let display = error.message.split('revert')[1].split('"')[0];
+        alert(display);
       });
     // let newraised = raised + bid
     // await this.setState({raised: newraised}, this.getDetails);
@@ -104,7 +107,7 @@ class Dashboard extends React.Component {
     const biddingTime = await contract.methods.biddingTime().call();
     const highestBid = await contract.methods.highestBid().call();
     const highestBidder = await contract.methods.highestBidder().call();
-    auctionDuration = await Number(auctionEndTime) * 1000;
+    auctionDuration = await Number(auctionDuration) * 1000;
     console.log(auctionDuration.toString())
     this.setState({ beneficiary, auctionDuration, highestBid: Number(highestBid), highestBidder });
   }
@@ -122,10 +125,11 @@ class Dashboard extends React.Component {
           <h1>Auction</h1>
           <p><strong>Welcome {name}!</strong></p>
           <p>Participate in the auction below before the time runs out</p>
-          {/* <p><strong>Congratulations {name}!</strong> with address {accounts ? accounts[0] : ""} If you're seeing this page, you've logged in with uPort successfully.</p>
-          <p>Here are the verifications you've shared with this app:</p>
-          <p>Change the data displayed here by updating the <code>verified</code> property in the argument to <code>requestDisclosure</code> in <code>src/components/util/LoginButton.js</code></p> */}
-          <div className="row">
+          <p><a
+          style={{cursor: "pointer"}}
+          onClick={() => window.location.reload()}
+          >Click here if you logged in freshly or you feel your data is lagging</a></p>
+           <div className="row">
             <div className="column">
               <label>Beneficiary</label>
               <blockquote><p><em id="beneficiary">{beneficiary ? beneficiary.substr(0, 12) : "Loading.."}</em><br /><br /></p></blockquote>
