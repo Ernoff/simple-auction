@@ -100,11 +100,11 @@ class Dashboard extends React.Component {
     const { contract } = this.state;
 
     const beneficiary = await contract.methods.beneficiary().call();
-    const auctionStart = await contract.methods.auctionStart().call();
+    let auctionDuration = await contract.methods.auctionEndTime().call();
     const biddingTime = await contract.methods.biddingTime().call();
     const highestBid = await contract.methods.highestBid().call();
     const highestBidder = await contract.methods.highestBidder().call();
-    const auctionDuration = await (Number(auctionStart) * 1000) + (Number(biddingTime) * 1000);
+    auctionDuration = await Number(auctionEndTime) * 1000;
     console.log(auctionDuration.toString())
     this.setState({ beneficiary, auctionDuration, highestBid: Number(highestBid), highestBidder });
   }

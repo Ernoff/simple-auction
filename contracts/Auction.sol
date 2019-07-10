@@ -5,7 +5,7 @@ contract Auction {
   // absolute unix timestamps (seconds since 1970-01-01)
   // or time periods in seconds.
   address payable public beneficiary;
-  uint public auctionStart;
+  uint public auctionEndTime;
   uint public biddingTime;
   // Current state of the auction.
   address public highestBidder;
@@ -13,7 +13,6 @@ contract Auction {
 
   // Allowed withdrawals of previous bids
   mapping(address => uint) pendingReturns;
-
   // Set to true at the end, disallows any change
   bool ended;
 
@@ -30,35 +29,26 @@ contract Auction {
   /// seconds bidding time on behalf of the
   constructor(uint _biddingTime, address payable _beneficiary) public {
     beneficiary = _beneficiary;
-    auctionStart = getTime();
+    auctionEndTime = getTime() + _biddingTime;
     biddingTime = _biddingTime;
   }
 
-
-   function getTime() internal view returns (uint) {
-    return now;
+  function getTime() internal view returns (uint256) {
+    return block.timestamp;
   }
-
   /// Bid on the auction with the value sent
   /// together with this transaction.
   /// The value will only be refunded if the
   /// auction is not won.
   function bid() public payable {
-    // No arguments are necessary, all
-    // information is already part of
-    // the transaction. The keyword payable
+    // The keyword payable
     // is required for the function to
     // be able to receive Ether.
-    if (getTime() > (auctionStart + biddingTime)) {
       // Revert the call if the bidding
       // period is over.
-      revert('Time has elapsed');
-    }
-    if (msg.value <= highestBid) {
-      // If the bid is not higher, send the
-      // money back.
-      revert('Bid too low');
-    }
+    require(getTime() <= auctionEndTime, 'Time has elapsed');
+      // If the bid is not higher, send the money back.
+    require(msg.value > highestBid, 'Bid is too low');
     if (highestBidder != address(0x00)) {
       // Sending back the money by simply using
       // highestBidder.send(highestBid) is a security risk
@@ -67,6 +57,7 @@ contract Auction {
       // to let the recipient withdraw their money themselves.
     pendingReturns[highestBidder] += highestBid;
     }
+    auctionEndTime += biddingTime;
     highestBidder = msg.sender;
     highestBid = msg.value;
     emit HighestBidIncreased(msg.sender, msg.value);
@@ -99,20 +90,13 @@ contract Auction {
     // 2. performing actions (potentially changing conditions)
 
     // 1. Conditions
-    if (getTime() <= auctionStart + biddingTime) {
-      revert('Bid has now ended'); // auction did not yet end
-    }
-    if (ended) {
-      revert('End has already been called'); // this function has already been called
-    }
-
+    require(getTime() >= auctionEndTime, 'Auction is still in progress');
+    require(!ended, "auction End has already being called");
     // 2. Effects
     ended = true;
     emit AuctionEnded(highestBidder, highestBid);
 
     //3. Interaction
-    if (!beneficiary.send(highestBid)) {
-      revert('Not allowed');
-    }
+    beneficiary.transfer(highestBid);
   }
 }
