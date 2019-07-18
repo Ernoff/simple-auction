@@ -1,6 +1,8 @@
 pragma solidity ^0.5.0;
 
-contract Auction {
+import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+
+contract Auction is Pausable {
   // Parameters of the auction. Times are either
   // absolute unix timestamps (seconds since 1970-01-01)
   // or time periods in seconds.
@@ -40,7 +42,7 @@ contract Auction {
   /// together with this transaction.
   /// The value will only be refunded if the
   /// auction is not won.
-  function bid() public payable {
+  function bid() public whenNotPaused() payable {
     // The keyword payable
     // is required for the function to
     // be able to receive Ether.
@@ -63,7 +65,7 @@ contract Auction {
     emit HighestBidIncreased(msg.sender, msg.value);
   }
   /// Withdraw a bid that was overbid.
-  function withdraw() public returns (bool) {
+  function withdraw() public whenNotPaused() returns (bool)  {
     uint amount = pendingReturns[msg.sender];
     if (amount > 0) {
       // It is important to set this to zero because the recipient
@@ -82,7 +84,7 @@ contract Auction {
 
   /// End the auction and send the highest bid
   /// to the beneficiary.
-  function auctionEnd() public {
+  function auctionEnd() public whenNotPaused() {
     // It is a good guideline to structure functions that interact
     // with other contracts (i.e. they call functions or send Ether)
     // into three phases:
