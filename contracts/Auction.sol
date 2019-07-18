@@ -60,8 +60,8 @@ contract Auction is Ownable, Pausable {
       // because it can be prevented by the caller by e.g.
       // raising the call stack to 1023. It is always safer
       // to let the recipient withdraw their money themselves.
-        pendingReturns[highestBidder] += highestBid;
-    }
+            pendingReturns[highestBidder] += highestBid;
+        }
         auctionEndTime += biddingTime;
         highestBidder = msg.sender;
         highestBid = msg.value;
