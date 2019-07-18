@@ -8,6 +8,9 @@ const INFURAID = fs.readFileSync(".env").toString().trim();
 
 console.log(INFURAID)
 module.exports = {
+
+  plugins: ["truffle-security"],
+
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
   networks: {
