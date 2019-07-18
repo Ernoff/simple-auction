@@ -1,6 +1,3 @@
-if (process.env.NODE_ENV == 'development') {
-  require('dotenv').config();
-}
 const fs = require('fs');
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const mnemonic = fs.readFileSync(".secret").toString().trim();

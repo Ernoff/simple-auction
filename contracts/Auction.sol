@@ -8,7 +8,7 @@ contract Auction is Ownable, Pausable {
   // absolute unix timestamps (seconds since 1970-01-01)
   // or time periods in seconds.
     address payable public beneficiary;
-    address public owner;
+    address payable public ownedBy;
     uint public auctionEndTime;
     uint public biddingTime;
   // Current state of the auction.
@@ -35,11 +35,11 @@ contract Auction is Ownable, Pausable {
         beneficiary = _beneficiary;
         auctionEndTime = getTime() + _biddingTime;
         biddingTime = _biddingTime;
-        owner = msg.sender;
+        ownedBy = msg.sender;
     }
 
     function getTime() internal view returns (uint256) {
-        return block.timestamp;
+        return now;
     }
   /// Bid on the auction with the value sent
   /// together with this transaction.
@@ -106,6 +106,6 @@ contract Auction is Ownable, Pausable {
     }
 
     function kill() public onlyOwner {
-        selfdestruct(owner);
+        selfdestruct(ownedBy);
     }
 }
