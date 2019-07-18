@@ -4,13 +4,14 @@
   "private": true,
   "engines": {
     "node": "10.6.0",
-    "npm":  "6.9.0"
+    "npm": "6.9.0"
   },
   "dependencies": {
     "connected-react-router": "^4.4.1",
     "fs-extra": "3.0.1",
     "history": "^4.7.2",
     "object-assign": "4.1.1",
+    "openzeppelin-solidity": "^2.3.0",
     "promise": "8.0.1",
     "raf": "3.4.0",
     "react": "^16.5.1",
