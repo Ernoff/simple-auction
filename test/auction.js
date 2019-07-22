@@ -17,18 +17,18 @@ contract('Auction', function (accounts) {
   it("...should reflect highest bidder from this address", function () {
     return Auction.deployed().then(function (instance) {
       auctionInstance = instance;
-      return auctionInstance.bid({ from: accounts[1], value: 4 });
+      return auctionInstance.bid({ from: accounts[0], value: 4 });
     }).then(function () {
       return auctionInstance.highestBidder.call();
     }).then(function (highestBidder) {
-      assert.equal(highestBidder, accounts[1], "The highest bidder changed");
+      assert.equal(highestBidder, accounts[0], "The highest bidder changed");
     });
   });
 
   it("...should throw error bid too low", function () {
     return Auction.deployed().then(function (instance) {
       auctionInstance = instance;
-      return auctionInstance.bid({ from: accounts[2], value: 4 });
+      return auctionInstance.bid({ from: accounts[0], value: 3 });
     })
     .catch((error) => {
      assert.equal(error.reason, 'Bid is too low')
@@ -38,7 +38,7 @@ contract('Auction', function (accounts) {
   it("...should throw error auction in progress", function () {
     return Auction.deployed().then(function (instance) {
       auctionInstance = instance;
-      return auctionInstance.auctionEnd({ from: accounts[2]});
+      return auctionInstance.auctionEnd({ from: accounts[0]});
     })
     .catch((error) => {
      assert.equal(error.reason, 'Auction is still in progress')

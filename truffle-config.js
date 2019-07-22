@@ -3,7 +3,6 @@ const HDWalletProvider = require('truffle-hdwallet-provider');
 const mnemonic = fs.readFileSync(".secret").toString().trim();
 const INFURAID = fs.readFileSync(".env").toString().trim();
 
-console.log(INFURAID)
 module.exports = {
 
   plugins: ["truffle-security"],

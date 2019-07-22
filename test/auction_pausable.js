@@ -3,7 +3,7 @@ const Auction = artifacts.require("./Auction.sol");
 contract('Pausable Auction', function (accounts) {
   const 
     Owner = accounts[0],
-    Bidder = accounts[1];
+    Bidder = "0x3079784dd93b10bc0243307af8f9a48a7189339b";
 
   it("...should not increased bid once paused", function () {
     let error = false
