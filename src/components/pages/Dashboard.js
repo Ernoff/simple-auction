@@ -117,7 +117,6 @@ class Dashboard extends React.Component {
   }
   render() {
     const { name, verified } = this.state.authData || {}
-    // console.log('DASHBOARD RENDERING', authData);
     const { accounts, beneficiary, highestBid, highestBidder, balance, response, raised, bid, auctionDuration } = this.state;
     return (
       <div>

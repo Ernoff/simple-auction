@@ -35,9 +35,21 @@ Ensure you have the following installed
     npm start
     ```
 
+## How to Use the dApp
+
+- Log in with uPort (You will need the mobile app if you don't have it already)
+- Upon log in, click on the link that says `Click here if you logged in freshly or you feel your data is lagging`
+- Beneficiary carries the owner of the contract
+- Ensure the account under `Your Account` reflects your own address
+- `From Account` lists all accounts attached to your account. You can swap between any to place a bid with.
+- `Bid Amount` takes in integers in ethers as bid
+-  A low bid will trigger an alert. A low bid is big lower or equal to Highest Bid
+-  Once you are ready to place a bid, click on the the `bid` button
+
 ## Notes of Importance
 
 - Ensure the same instance of ganache-cli is running during the entire lifecycle of the application
+- If you see `Loading...` for more than 1 second, you will need to click on the link that says `Click here if you logged in freshly or you feel your data is lagging`. If that doesn't clear it, your deployed contract may be unaccessible
 
 ## Test
 
