@@ -76,7 +76,7 @@ contract Auction is Ownable, Pausable {
       // before `send` returns.
             pendingReturns[msg.sender] = 0;
       // msg.sender.transfer(amount);
-            if (!msg.sender.send(amount)) {
+            if (!msg.sender.transfer(amount)) {
       //   // No need to call throw here, just reset the amount owing
                 pendingReturns[msg.sender] = amount;
                 return false;
