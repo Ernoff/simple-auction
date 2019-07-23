@@ -28,7 +28,7 @@ Ensure you have the following installed
     - If you choose to run them seperately you can do `truffle compile` followed by `truffle migrate --network development`
 
     NB: Setup for ropsten is included but to deploy to ropsten, add you Ropsten ID to `.env` and your key phrase to `.secret`
-5. Copy content of `build/contract/Auction.json` to `/src/components/pages/Auction.json`
+5. Copy content of `build/contract/Auction.json` to `src/components/pages/Auction.json`
 
 6. Start project locally
     ```javascript
